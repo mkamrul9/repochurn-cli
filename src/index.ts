@@ -11,7 +11,7 @@ program
     .version('1.0.0');
 
 program
-    .argument('<repository>', 'GitHub repository identifier in format "owner/repo" (e.g., facebook/react)')
+    .argument('<repository>', 'GitHub repository identifier in format "owner/repo" (e.g., vercel/next.js)')
     .option('-d, --days <number>', 'Number of days to analyze retrospectively', '30')
     .action((repository: string, options: { days: string }) => {
         const daysParsed = parseInt(options.days, 10);
