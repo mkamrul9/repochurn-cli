@@ -1,5 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 import { config } from '../utils/config.js';
+import { handleGitHubApiError } from './errorHandler.js';
 import { GitHubCommitListItem, GitHubCommitDetail } from './types.js';
 
 class GitHubClient {
@@ -22,6 +23,13 @@ class GitHubClient {
             timeout: config.defaultTimeout,
             headers,
         });
+
+        this.instance.interceptors.response.use(
+            (response) => response,
+            (error) => {
+                return handleGitHubApiError(error);
+            }
+        );
     }
 
     /**
