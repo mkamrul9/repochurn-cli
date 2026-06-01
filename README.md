@@ -10,9 +10,9 @@ Follow these exact steps to run the tool on any fresh machine with Node.js (v18+
 
 ### 1. Install Dependencies
 Clone the repository and install the required packages:
-\`\`\`bash
+```bash
 npm install
-\`\`\`
+```
 
 ### 2. Configure the GitHub Token (Highly Recommended)
 Unauthenticated GitHub API requests are strictly capped at 60 requests per hour. Because RepoChurn fetches deep commit metadata, you will hit this limit quickly.
@@ -20,26 +20,29 @@ Unauthenticated GitHub API requests are strictly capped at 60 requests per hour.
 1. Generate a Personal Access Token (Classic) at [GitHub Settings -> Tokens](https://github.com/settings/tokens). No specific scopes are required for public repositories.
 2. Create a `.env` file in the root directory.
 3. Add your token:
-\`\`\`text
+```text
 GITHUB_TOKEN=your_token_here
-\`\`\`
+```
 *(This boosts your limit to 5,000 requests/hr).*
 
 ### 3. Build & Execute
 Compile the TypeScript code and run the CLI against a public repository (format: `owner/repo`):
 
-\`\`\`bash
+```bash
 npm run build
 npm start vercel/next.js
-\`\`\`
+```
 
 ### Optional Flags
 You can adjust the retrospective lookback window using the `-d` or `--days` flag (defaults to 30):
-\`\`\`bash
+```bash
 npm start vercel/next.js -- -d 15
-\`\`\`
+```
 
 ##  Resiliency & Edge Cases Handled
 * **Abuse Detection Throttling:** Network requests are batched concurrently (10 at a time) to prevent triggering GitHub's secondary abuse limits.
 * **Rate Limit Diagnostic:** If the 403 Forbidden rate limit is hit, the app intercepts the header and outputs a human-readable countdown timer detailing exactly when the limit resets.
 * **Ghost Commits:** Safely processes `null` authors (deleted accounts or unlinked local git configs) via nullish coalescing to prevent fatal runtime crashes mid-batch.
+
+## License
+MIT. See [LICENSE](LICENSE).
