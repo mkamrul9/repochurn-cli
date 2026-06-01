@@ -39,7 +39,7 @@ You can adjust the retrospective lookback window using the `-d` or `--days` flag
 npm start vercel/next.js -- -d 15
 \`\`\`
 
-## 🛡️ Resiliency & Edge Cases Handled
+##  Resiliency & Edge Cases Handled
 * **Abuse Detection Throttling:** Network requests are batched concurrently (10 at a time) to prevent triggering GitHub's secondary abuse limits.
 * **Rate Limit Diagnostic:** If the 403 Forbidden rate limit is hit, the app intercepts the header and outputs a human-readable countdown timer detailing exactly when the limit resets.
 * **Ghost Commits:** Safely processes `null` authors (deleted accounts or unlinked local git configs) via nullish coalescing to prevent fatal runtime crashes mid-batch.
