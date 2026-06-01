@@ -4,6 +4,7 @@ import chalk from 'chalk';
 import boxen from 'boxen';
 import { GitHubApiException } from './api/errorHandler.js';
 import { getLookbackDateISO } from './utils/time.js';
+import { analyzeRepository } from './core/analyzer.js';
 
 const program = new Command();
 
@@ -42,7 +43,18 @@ program
                 )
             );
 
-            // Phase 7 logic (API Calls) will go here.
+            // Phase 7: Core Analysis
+            const [owner, repoName] = repository.split('/');
+            const report = await analyzeRepository(owner, repoName, sinceISO);
+
+            if (report.commitCount === 0) {
+                console.log(chalk.yellow(`\nNo commits found for ${repository} in the last ${daysParsed} days. The repository might be inactive.`));
+                process.exit(0);
+            }
+
+            // We will build the final UI rendering in Phase 8, for now, just output raw data
+            console.log(chalk.green(`\nAnalysis complete! Processed ${report.analyzedCommits} commits.`));
+            console.log(report.hotspots);
         } catch (error) {
             if (error instanceof GitHubApiException) {
                 let content = `${chalk.red.bold('✕ System Fault Executed')}\n\n` +
