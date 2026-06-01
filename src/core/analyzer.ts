@@ -38,7 +38,8 @@ export async function analyzeRepository(owner: string, repo: string, sinceISO: s
 
     // 3. Aggregate Churn Data
     for (const detail of commitDetails) {
-        const authorName = detail.author?.login || 'Unknown Author';
+        // EDGE CASE FORTIFICATION: Safely handle deleted accounts or unlinked git configs
+        const authorName = detail.author?.login ?? 'Ghost Contributor (Unlinked/Deleted)';
 
         if (detail.files) {
             for (const file of detail.files) {
