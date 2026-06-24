@@ -1,48 +1,107 @@
-# RepoChurn: The Codebase Velocity Oracle
+# repochurn-cli
 
-RepoChurn is a CLI tool designed to solve the developer onboarding problem. When joining a new project, the GitHub UI shows a chronological list of commits, but it doesn't tell you *where* the codebase is actively churning. 
+---
 
-RepoChurn analyzes the last 30 days of commit history, maps file modifications, and outputs a formatted terminal dashboard of the top "Code Hotspots" and their primary "Knowledge Owners."
+## 📖 What the Tool Does
+`repochurn-cli` is a **Node.js command‑line utility** that analyses a Git repository’s *churn* – the frequency and magnitude of changes to each file over time.  It walks the commit history, aggregates line‑addition/deletion/modification counts, identifies hotspots, and can emit the results in **JSON**, **CSV**, or **Markdown**.  By surfacing which files change most often, teams can:
 
-## How to Run (Fresh Machine Setup)
+* Detect technical debt early
+* Prioritise testing and code‑review effort on volatile files
+* Make data‑driven refactoring decisions
+* Integrate churn metrics into CI pipelines for quality gates
 
-Follow these exact steps to run the tool on any fresh machine with Node.js (v18+) installed.
+---
 
-### 1. Install Dependencies
-Clone the repository and install the required packages:
+## 🎯 Why the Project Exists
+- **Code‑base health:** Continuous insight into file‑level churn helps keep the code stable.
+- **Risk management:** High‑churn files are statistically more error‑prone; the tool highlights them automatically.
+- **Data‑driven workflows:** Generates machine‑readable reports that can be consumed by dashboards or CI checks.
+- **Lightweight & extensible:** No heavyweight dependencies, easy to drop into existing projects or CI pipelines.
+
+---
+
+## 🚀 Core Features
+| Feature | Description | CLI Example |
+|---------|-------------|-------------|
+| **Full repository churn report** | Calculates total additions, deletions, and modifications per file. | `repochurn-cli analyze .` |
+| **Date‑range filtering** | Restrict analysis to a specific window (e.g., last 30 days). | `repochurn-cli analyze . --since 2024-01-01 --until 2024-02-01` |
+| **File pattern inclusion/exclusion** | Focus on certain directories or ignore generated files. | `repochurn-cli analyze . --include "src/**/*.js" --exclude "node_modules/**"` |
+| **Hotspot identification** | Shows the top N most‑churny files. | `repochurn-cli analyze . --top 10` |
+| **Multiple output formats** | JSON for programmatic consumption, CSV for spreadsheets, Markdown for human‑readable reports. | `repochurn-cli analyze . --format json` |
+| **CI integration** | Emit a JSON report that can break builds when churn thresholds are exceeded. | `repochurn-cli analyze . --format json --fail-on-threshold 500` |
+| **Config file support** | Default options can be stored in a `.repochurnrc` file at the project root. | Automatically read when present. |
+
+---
+
+## 🛠️ Getting Started
+### Prerequisites
+- **Node.js** ≥ 18
+- **npm** ≥ 9 (or **yarn** / **pnpm**) 
+- A **Git** repository you want to analyse.
+
+### Installation
 ```bash
-npm install
+# Global install (adds the `repochurn-cli` command to PATH)
+npm i -g repochurn-cli
+
+# Or as a dev‑dependency in a project
+npm i -D repochurn-cli
 ```
-
-### 2. Configure the GitHub Token (Highly Recommended)
-Unauthenticated GitHub API requests are strictly capped at 60 requests per hour. Because RepoChurn fetches deep commit metadata, you will hit this limit quickly.
-
-1. Generate a Personal Access Token (Classic) at [GitHub Settings -> Tokens](https://github.com/settings/tokens). No specific scopes are required for public repositories.
-2. Create a `.env` file in the root directory.
-3. Add your token:
-```text
-GITHUB_TOKEN=your_token_here
-```
-*(This boosts your limit to 5,000 requests/hr).*
-
-### 3. Build & Execute
-Compile the TypeScript code and run the CLI against a public repository (format: `owner/repo`):
-
+### Basic Usage
 ```bash
-npm run build
-npm start vercel/next.js
+# Analyse the current repository and output a Markdown report
+repochurn-cli analyze . --format md > CHURN_REPORT.md
+
+# Analyse only the last 90 days and output JSON
+repochurn-cli analyze . --since "90 days ago" --format json
 ```
-
-### Optional Flags
-You can adjust the retrospective lookback window using the `-d` or `--days` flag (defaults to 30):
-```bash
-npm start vercel/next.js -- -d 15
+### Configuration File (optional)
+Create a `.repochurnrc` in the repository root:
+```json
+{
+  "since": "2024-01-01",
+  "until": "2024-12-31",
+  "exclude": ["node_modules/**", "dist/**"],
+  "format": "json"
+}
 ```
+The CLI will automatically merge these defaults with any command‑line flags you pass.
 
-##  Resiliency & Edge Cases Handled
-* **Abuse Detection Throttling:** Network requests are batched concurrently (10 at a time) to prevent triggering GitHub's secondary abuse limits.
-* **Rate Limit Diagnostic:** If the 403 Forbidden rate limit is hit, the app intercepts the header and outputs a human-readable countdown timer detailing exactly when the limit resets.
-* **Ghost Commits:** Safely processes `null` authors (deleted accounts or unlinked local git configs) via nullish coalescing to prevent fatal runtime crashes mid-batch.
+---
 
-## License
-MIT. See [LICENSE](LICENSE).
+## 📚 Documentation
+- **README** – This file (quick start, feature list, usage examples).
+- **PROJECT_OVERVIEW.md** – High‑level architecture and roadmap (see `docs/PROJECT_OVERVIEW.md`).
+- **ARCHITECTURE.md** – Mermaid diagram of the internal component layout (in `docs/`).
+- **DEVELOPMENT.md** – How to run tests, add new output formats, and work on the codebase (`docs/DEVELOPMENT.md`).
+- **CODE_QUALITY_GUIDELINES.md** – Recommended practices for keeping the project production‑grade (`CODE_QUALITY_GUIDELINES.md`).
+
+---
+
+## 🤝 Contributing
+1. **Fork** the repository and clone your fork.
+2. Create a feature branch:
+   ```bash
+   git checkout -b feat/<your‑feature>
+   ```
+3. Install dependencies:
+   ```bash
+   npm ci
+   ```
+4. Run the lint and test suite before committing:
+   ```bash
+   npm run lint && npm test
+   ```
+5. Make your changes, add or update tests, and update documentation if you alter the public API.
+6. Commit using **Conventional Commits** (e.g., `feat: add CSV output`).
+7. Push and open a Pull Request.  CI will automatically run lint, tests, and a smoke‑test of the CLI.
+8. Ensure the PR checklist passes (see **CODE_QUALITY_GUIDELINES.md** for the full checklist).
+
+---
+
+## 📄 License
+`repochurn-cli` is released under the **MIT License**.  See the `LICENSE` file for the full text.
+
+---
+
+*Prepared by Antigravity AI – your coding co‑pilot.*
