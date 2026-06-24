@@ -1,16 +1,29 @@
 {
   "name": "repochurn-cli",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "version": "2.0.0",
+  "description": "CLI tool to analyze GitHub repository churn — hotspots, velocity, contributors, and risk scoring",
+  "main": "dist/index.js",
+  "bin": {
+    "repochurn": "dist/index.js"
+  },
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
-    "dev": "tsx src/index.ts"
+    "dev": "tsx src/index.ts",
+    "dev:analyze": "tsx src/index.ts analyze",
+    "lint": "tsc --noEmit"
   },
-  "keywords": [],
+  "keywords": [
+    "git",
+    "churn",
+    "hotspot",
+    "analysis",
+    "cli",
+    "github",
+    "devtools"
+  ],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "type": "commonjs",
   "devDependencies": {
     "@types/node": "^25.9.1",
